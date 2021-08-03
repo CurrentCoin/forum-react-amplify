@@ -1,0 +1,48 @@
+type Blog @model @auth (
+  rules: [
+      { allow: owner },
+      { allow: public, provider: iam, operations: [read] },      
+      { allow: groups, groups: ["superadmin"] }       
+    ]
+  ) {
+  id: ID!
+  content: String
+  banner: String
+  name: String!
+  rank: Int
+  posts: [Post] @connection(name: "BlogPosts")
+}
+type Post @model @auth (
+  rules: [
+      { allow: owner },
+      { allow: public, provider: iam, operations: [read] },
+      { allow: groups, groups: ["superadmin"]},
+      { allow: groups, groups: ["admin"]}
+    ]
+  ) {
+  id: ID!
+  title: String!
+  content: [String]
+  banner: String
+  images: [String]
+  tags: [String]
+  author: String
+  votes: Int
+  blog: Blog @connection(name: "BlogPosts")
+  comments: [Comment] @connection(name: "PostComments")
+}
+type Comment @model @auth (
+  rules: [
+      { allow: owner },
+      { allow: public, provider: iam, operations: [read] },
+      { allow: groups, groups: ["superadmin"]},
+      { allow: groups, groups: ["admin"]}
+    ]
+  ) {
+  id: ID!
+  content: String
+  author: String
+  banner: String
+  votes: Int
+  post: Post @connection(name: "PostComments")
+}
